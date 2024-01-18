@@ -1,6 +1,5 @@
 package com.yuan.demo.interceptor;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -11,9 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.CallbackException;
-import org.hibernate.EmptyInterceptor;
+import org.hibernate.Interceptor;
 import org.hibernate.type.Type;
-import org.springframework.stereotype.Component;
 
 import com.yuan.demo.entity.EmpAudit;
 import com.yuan.demo.repository.EmpAuditRepository;
@@ -21,33 +19,25 @@ import com.yuan.demo.repository.EmpAuditRepository;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Component
-public class JpaInterceptor extends EmptyInterceptor {
-
-	private static final long serialVersionUID = 1L;
+public class JpaInterceptor implements Interceptor {
 	
-	// 查詢數據前執行
 	@Override
-	public boolean onLoad(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types)
+	public boolean onLoad(Object entity, Object id, Object[] state, String[] propertyNames, Type[] types)
 			throws CallbackException {
-		// TODO Auto-generated method stub
 		System.out.println("=====execute onLoad=====");
-		return super.onLoad(entity, id, state, propertyNames, types);
+		return Interceptor.super.onLoad(entity, id, state, propertyNames, types);
 	}
 	
-	// 新增數據前執行
 	@Override
-	public boolean onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types)
+	public boolean onSave(Object entity, Object id, Object[] state, String[] propertyNames, Type[] types)
 			throws CallbackException {
-		// TODO Auto-generated method stub
 		System.out.println("=====execute onSave=====");
-		return super.onSave(entity, id, state, propertyNames, types);
+		return Interceptor.super.onSave(entity, id, state, propertyNames, types);
 	}
 	
-	// 數據更新前執行
 	@Override
-	public boolean onFlushDirty(Object entity, Serializable id, Object[] currentState, Object[] previousState,
-			String[] propertyNames, Type[] types) {
+	public boolean onFlushDirty(Object entity, Object id, Object[] currentState, Object[] previousState,
+			String[] propertyNames, Type[] types) throws CallbackException {
 		System.out.println("=====execute onFlushDirty=====");
 		EmpAuditRepository empAuditRepository = SpringContextService.getBean(EmpAuditRepository.class);
 		Class<?> entityClass = null;
@@ -92,7 +82,7 @@ public class JpaInterceptor extends EmptyInterceptor {
 						empAudit.setFieldName(propertyName);
 						empAudit.setOldValue(getObjectValue(previousObj));
 						empAudit.setNewValue(getObjectValue(currentObj));
-						empAudit.setInsertedBy("JiaYu");
+						empAudit.setInsertedBy("Interceptor");
 						empAudit.setInsertedDt(new Date());
 						empAuditRepository.save(empAudit);
 					}
@@ -104,8 +94,9 @@ public class JpaInterceptor extends EmptyInterceptor {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return super.onFlushDirty(entity, id, currentState, previousState, propertyNames, types);
+		return Interceptor.super.onFlushDirty(entity, id, currentState, previousState, propertyNames, types);
 	}
+	
 
 	public static Field getJpaIdField(Class<?> clazz) {
 		Field[] fields = clazz.getDeclaredFields();
@@ -133,7 +124,7 @@ public class JpaInterceptor extends EmptyInterceptor {
 		if ((oldObj == null && newObj != null) || (oldObj != null && newObj == null))
 			return true;
 
-// if one of the object is null it should never pass this line.
+		// if one of the object is null it should never pass this line.
 
 		if (oldObj instanceof String || oldObj instanceof Character) {
 			if (!oldObj.toString().equals(newObj.toString()))

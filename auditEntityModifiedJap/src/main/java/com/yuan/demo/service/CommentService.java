@@ -19,8 +19,8 @@ public class CommentService {
 	@Transactional
 	public Comment updateAndSave(Comment comment) {
 		comment.setArticleId(1);
-		comment.setAuthor("Brian77");
-		comment.setContent("content by Brian77");
+		comment.setAuthor("Brian33");
+		comment.setContent("content by Brian33");
 		comment.setInsertedDt(new Date());
 		return commentRepository.save(comment);
 	}

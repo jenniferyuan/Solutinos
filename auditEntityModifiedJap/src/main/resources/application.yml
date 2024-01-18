@@ -11,15 +11,13 @@ spring:
           auto: update # 由Entity逆向生成table
         '[format_sql]': true
         '[session_factory]':
-          #statement_inspector: com.yuan.demo.interceptor.JpaInterceptor
-          interceptor: com.yuan.demo.interceptor.JpaInterceptorV6
+          interceptor: com.yuan.demo.interceptor.JpaInterceptor
   sql:
     init:
       schema-locations:
       - classpath:sql/table.sql
       data-locations:
       - classpath:sql/data.sql
-#      - classpath:sql/empData.sql
       mode: NEVER
       
 # for console sql parameters
@@ -27,4 +25,6 @@ logging:
   level:
     '[org.hibernate]': info
     '[org.hibernate.SQL]': debug
-    '[org.hibernate.orm.jdbc.bind]': TRACE     
+    '[org.hibernate.orm.jdbc.bind]': TRACE
+    
+     
