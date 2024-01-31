@@ -13,7 +13,7 @@ Java jdk 17
 MySql 8
 ```
 ### 方案1.使用 Hibernate Interceptor(限JPA)
-step1. 實現一個 org.hibernate.Interceptor類，並重寫 onFlushDirty 方法
+step1. 新增一個類實現 org.hibernate.Interceptor，並重寫 onFlushDirty 方法。
 ```java
 public class JpaInterceptor implements Interceptor {
 
@@ -24,6 +24,40 @@ public class JpaInterceptor implements Interceptor {
 			...................
 	}
 }
+```
+step2. 因為上面的攔截器只是一個普通Java類，所以需要新增一個類實現 org.springframework.context.ApplicationContextAware，
+       通過該類來注入IOC容器中的對象。
+```java
+@Component
+public class SpringContextService implements ApplicationContextAware {
+
+	private static ApplicationContext applicationContext;
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (SpringContextService.applicationContext == null) {
+			SpringContextService.applicationContext = applicationContext;
+		}
+	}
+
+	public static <T> T getBean(Class<T> clazz) {
+		return applicationContext.getBean(clazz);
+	}
+
+	public static Object getBean(String beanName) {
+		return applicationContext.getBean(beanName);
+	}
+}
+```
+step3.配置文件中配置。
+```yml
+spring:
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl: 
+        '[session_factory]':
+          interceptor: com.yuan.demo.interceptor.JpaInterceptor
 ```
 
 ### 方案2.使用 AOP(任何ORM都適用)
