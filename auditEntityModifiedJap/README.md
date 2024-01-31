@@ -61,5 +61,22 @@ spring:
 ```
 
 ### 方案2.使用 AOP(任何ORM都適用)
+step1. 新增一個Aspect類實現。
+```java
+@Aspect
+@Component
+public class EntityUpdateAspect {
+	
+	@Before("execution(* com.yuan.demo.service.CommentService.updateAndSave(..)) && args(entity)")
+    public void logPreUpdate(JoinPoint joinPoint, Object entity) {
+		.......................................
+	}
+	
+	@AfterReturning(value = "execution(* com.yuan.demo.service.CommentService.updateAndSave(..))", returning = "result")
+    public void logPostUpdate(JoinPoint joinPoint, Object result) {
+    	........................................
+	}
+}
+```
 
 ##  範例程式使用
